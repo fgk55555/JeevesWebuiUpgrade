@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>Blank Template for Bootstrap</title>
+        <!-- Bootstrap core CSS -->
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+        <!-- Custom styles for this template -->
+        <link href="style.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <!-- include EventEmitter library ... currently not used in this sample -->
+
+    <script type="text/javascript"
+      src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js">
+    </script>
+
+     <!-- include the roslibjs library ... required -->
+    <script type="text/javascript"
+      src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js">
+    </script>
+
+     <!-- include jquery library ... required in the sample -->
+    <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+
+
+
+    <!-- Link to external javascript file: jeeves_rosbridge.js -->
+    <!--<script type="text/javascript" src="./scripts/jeeves_rosbridge.js"></script> -->
+    <script type="text/javascript">
+      // Copied from website http://blog.endpoint.com/2015/03/simple-cross-browser-communication-ros.html ...
+      //* The Ros object, wrapping a web socket connection to rosbridge.
+      var ros = new ROSLIB.Ros({
+        url: 'ws://localhost:9090' // url to your rosbridge server
+      });
+
+      //* A topic for messaging.
+      var exampleTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/test_topic', // use a sensible namespace
+        messageType: 'std_msgs/String' //Create a pose object (geometry_msg(s)/Pose) 
+
+      });
+
+      /*
+       * Serializes an object and publishes it to a std_msgs/String topic.
+       * @param {ROSLIB.Topic} topic
+       *       A topic to publish to. Must use messageType: std_msgs/String
+       * @param {Object} obj
+       *       Any object that can be serialized with JSON.stringify
+       */
+      function publishEncoded(topic, obj) {
+        var msg = new ROSLIB.Message({
+
+        data: JSON.stringify(obj)
+        });
+        topic.publish(msg);
+      }
+
+      /*
+       * Decodes an object from a std_msgs/String message.
+       * @param {Object} msg
+       *       Message from a std_msgs/String topic.
+       * @return {Object}
+       *       Decoded object from the message.
+       */
+      function decodeMessage(msg) {
+        return JSON.parse(msg.data);
+      }
+
+      // Example of subscribing to a topic with decodeMessage().
+      exampleTopic.subscribe(function(msg) {
+        var decoded = decodeMessage(msg);
+        // do something with the decod// Explicitly declare that we intend to publish on this Topic.
+        console.log(decoded);
+
+        // decoded is a Object type
+        // Since the data sent is in JSON {'fubar': <text>}, to get the contents of <text>,
+        // ... must point to the Object attribute: fubar
+        // Show the contents of <text> in the HTML element with id 'topic_data' - see line 113
+        $('#topic_data').text(decoded.name + ', ' + decoded.theta + ', ' + decoded.x + ', ' + decoded.y);
+      });
+
+      // Example of simple publishing a text
+      function publish(text, dir, xloc, yloc) {
+
+        // The object to publish is JSON format, with key: value pair (like a Python dictionary)
+        // The JSON data is {'fubar': text}
+        // Looks like quotes are optional for the key and value
+        var myObject = {
+          //fubar: text
+          name: text,
+          theta: parseFloat(dir),
+          x: parseFloat(xloc),
+          y: parseFloat(yloc)
+
+        }
+
+        // Publish to exampleTopic with data myObject
+        publishEncoded(exampleTopic, myObject);
+      }
+
+      // When the page is loaded, make the connection that when #thisdiv is clicked,
+      // ... publish the value of the attribute "myvar" for #thisdiv
+      $(document).ready(function(){
+        // $('.ta1').click(function(){
+        //   var data = $(this).attr('myvar'); // The attribute name "myvar" is something you make up - not restricted by HTML - see line 103
+        //   publish(data);
+        // })
+/*
+        $('.waypoint').click(function(){
+          var name = $(this).attr('wp_name'); // The attribute name "myvar" is something you make up - not restricted by HTML - see line 103
+          var theta = $(this).attr('wp_theta');
+          var x = $(this).attr('wp_x');
+          var y = $(this).attr('wp_y');
+          publish(name, theta, x, y);
+        })
+*/
+
+/*
+        $('.waypoint2').click(function(){
+          var data = $(this).attr('wp_data'); // The attribute name "myvar" is something you make up - not restricted by HTML - see line 103
+          var values = data.split(",");
+          var name = values[0];
+          var theta = values[1];
+          var x = values[2];
+          var y = values[3];
+          publish(name, theta, x, y);
+        })
+*/
+        $("#loc_stairs").click(function(){
+          publish('stairs',-3.1060844052587924,29.202352575785255,23.40698951851576);
+        });
+
+        $("#loc_robotics").click(function(){
+          publish('robotics_lab',0.1105266655009746,17.45905425876805,81.38874413985823);
+        });
+
+        $("#loc_near").click(function(){
+          publish('near_lab',-0.022916801545406058,23.30654292170408,109.30353839050414);
+        });
+
+        $("#loc_home").click(function(){
+          publish('home',1.2534319054185048,23.941112909737804,38.115362279813056);
+        });
+
+        $("#loc_ee").click(function(){
+          publish('ee',-1.6946447122912436,37.241123982082115,82.9187558778446);
+        });
+
+        $("#loc_wp0").click(function(){
+          publish('wp0',0.8937400604167252,21.650804540129307,35.248776269307);
+        });
+
+        $("#loc_biomed").click(function(){
+          publish('biomedical lab',-3.1390081307815554,19.126409811120357,59.22409214178634);
+        });
+
+        $("#loc_locker").click(function(){
+          publish('locker',1.5915679422346392,18.624419864212452,33.922473882585415);
+        });
+
+        $("#nav_home_button").click(function(){
+          $("#nav_home").show();
+          $("#nav_qr").hide();
+          $("#nav_stop").hide();
+          $("#nav_place").hide();
+          publish('return home');
+        });
+
+        $("#nav_stop_button").click(function(){
+          $("#nav_stop").show();
+          $("#nav_home").hide();
+          $("#nav_qr").hide();
+          $("#nav_place").hide();
+          publish('Navigation Stopped');
+        });
+
+        $("#nav_qr_button").click(function(){
+          $("#nav_qr").show();
+          $("#nav_home").hide();
+          $("#nav_stop").hide();
+          $("#nav_place").hide();
+          publish('heres a QR');
+        });
+
+        $("#nav_place_button").click(function(){
+          $("#nav_place").show();
+          $("#nav_home").hide();
+          $("#nav_stop").hide();
+          $("#nav_qr").hide();
+          publish('Add here');
+        })
+
+
+      })
+        $("#nav_qr").hide();
+        $("#nav_stop").hide();
+        $("#nav_place").hide();
+
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="media">
+                <div class="media-right media-middle">
+                    <a href="#">
+                        <img class="media-object" src="./Img/robo-butler.jpg">
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h1><p class="text-center">J.E.E.V.E.S</p><small><p class="text-center">At your service.</p></small></h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=" col-md-12">
+                <ul class="nav nav-tabs centered">
+                    <li>
+                        <a id="nav_home_button" href="#">HOME</a>
+                    </li>
+                    <li>
+                        <a id="nav_qr_button"  href="#">GET QR</a>
+                    </li>
+                    <li>
+                        <a id="nav_stop_button" href="#">STOP NAVIGATION</a>
+                    </li>
+                    <li>
+                        <a id="nav_place_button" href="#">PLACE HOLDER</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="col-md-4">
+            <div class="dropdown">
+                <button class="btn btn -default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Go To Location
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li>
+                      <a id="loc_stairs" href="#">Stairs</a>
+                  </li>
+                  <li role="separator" class="divider"></li>
+
+                  <li>
+                      <a id="loc_robotics" href="#">Robotics Lab</a>
+                  </li>
+                  <li role="separator" class="divider"></li>
+
+                  <li>
+                      <a id="loc_near" href="#" >NEAR lab</a>
+                  </li>
+                  <li role="separator" class="divider"></li>
+
+                  <li>
+                      <a id="loc_home" href="#">Home</a>
+                  </li>
+                  <li role="separator" class="divider"></li>
+
+                  <li>
+                      <a id="loc_ee" href="#">EE</a>
+                  </li>
+                  <li role="separator" class="divider"></li>
+
+                  <li>
+                      <a id="loc_wp0" href="#">WP0</a>
+                  </li>
+                  <li role="separator" class="divider"></li>
+
+                  <li>
+                      <a id="loc_biomed" href="#">Biomedical Lab</a>
+                  </li>
+                  <li role="separator" class="divider"></li>
+
+                  <li>
+                      <a id="loc_locker" href="#">Locker</a>
+                  </li>
+                </ul>
+            </div>
+              <div id="topic_output"><p>Got message: <span id="topic_data"></span></p></div>
+        </div>
+
+        <div id="nav_home" class="col-md-8">
+            <div class="thumbnail-menu">
+                <a class="camera-header" id="dynamic_camera" myvar="streaming NOW">CAMERA VIEW</a>
+                <img class="camera-block" src="./Img/hallways_all.png" width="750">
+            </div>
+        </div>
+
+        <div id="nav_qr">
+          <p>
+            It's QR time.
+          </p>
+        </div>
+
+        <div id="nav_stop">
+          <p>
+            Jeeves Navigation Stopped.
+            Please Select a Location.....
+          </p>
+        </div>
+
+        <div id="nav_place">
+          <p>
+            Add Content.
+          </p>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>

@@ -1,0 +1,50 @@
+/* Chrome, Safari, Opera */
+@-webkit-keyframes mymove {
+    50% {background-color: blue;}
+}
+
+/* Standard syntax */
+@keyframes mymove {
+    50% {background-color: blue;}
+}
+
+.media-object{
+ 	height:px;   
+}
+
+.media-body{
+    padding-top:60px;
+    background-color:#F0FAF8;
+    background-color:rgb(240,250,248);
+   /* -webkit-animation: mymove 5s infinite;
+    animation: mymove 5s infinite;*/
+}
+
+h1{
+    text-shadow: 2px 2px #14A886;
+}
+.nav-tabs{
+	padding-top:px;
+    padding-left:180px;
+}
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs, .nav-pills {
+    text-align:center;
+}
+
+.dropdown{
+
+    padding: 5px;
+    padding-left:15px;
+    background-color:; 
+    color:black;
+    opacity:;
+}
+
+

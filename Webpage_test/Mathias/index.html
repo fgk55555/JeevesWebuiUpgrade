@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>Blank Template for Bootstrap</title>
+        <!-- Bootstrap core CSS -->
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+        <!-- Custom styles for this template -->
+        <link href="style.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2">
+                    <h1><a href="{% url 'MrJeevesApp.views.index' %}"><span class="glyphicon glyphicon-chevron-left"></span>Back</a></h1>
+                </div>
+                <div class="col-md-8">
+                    <div class="page-header">
+                        <h1><p class="text-center">NAVIGATION</p></h1>
+                    </div>
+                </div>
+                <div class="col-md-2">
+</div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li role="presentation">
+                            <a href="#save_pose_modal" data-toggle="modal" data-target="#save_pose_modal">Save current pose</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="{% url 'cancel_waypoint' %}">Cancel Current Goal</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" data-toggle="modal" data-target="#nav-test-modal">Run Nav Test</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-10">
+                    {% if qs %}
+                    {% if qs.s == '0' %}
+                    <div class="alert alert-success alert-dismissable" role="alert">
+                        <button type-"button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Success!</strong> Waypoint added.
+                    </div>
+                    {% elif qs.s == '-1' %}
+                    <div class="alert alert-danger alert-dismissable" role="alert">
+                        <button type-"button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Uh oh!</strong> Failed to add waypoint.
+                    </div>
+                    {% endif %}
+                    {% if qs.d == '0' %}
+                    <div class="alert alert-success alert-dismissable delete-success" role="alert">
+                        <button type-"button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Success!</strong> Waypoint deleted.
+                    </div>
+                    {% elif qs.d == '-1' %}
+                    <div class="alert alert-danger alert-dismissabledelete-failed" role="alert">
+                        <button type-"button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Uh oh!</strong> Failed to delete waypoint.
+                    </div>
+                    {% endif %}
+                    {% if qs.c == '0' %}
+                    <div class="alert alert-success alert-dismissable" role="alert">
+                        <button type-"button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Success!</strong> Current goal has been cancelled.
+                    </div>
+                    {% endif %}
+                    {% if qs.w == '0' %}
+                    <div class="alert alert-success alert-dismissable" role="alert">
+                        <button type-"button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Success!</strong> Set current pose to waypoint.
+                    </div>
+                    {% elif qs.w == '-1' %}
+                    <div class="alert alert-danger alert-dismissable" role="alert">
+                        <button type-"button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Uh oh!</strong> Failed to set pose to waypoint.
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    <table class="table table-hover">
+                        <thead>
+                            <th class="col-md-2">Waypoint</th>
+                            <th class="col-md-4">Location (x, y, theta)</th>
+                            <th class="col-md-1">Enabled</th>
+                            <th class="col-md-5">Actions</th>
+                        </thead>
+                        <tbody>
+                            {% for waypoint in waypoints %}
+                            {% with x=waypoint.x|floatformat:3 y=waypoint.y|floatformat:3 theta=waypoint.theta|floatformat:3 %}
+                            <tr>
+                                <td>
+                                    <button class="btn btn-primary btn-lg btn-goto" data-href="{% url 'goto_waypoint' %}?waypoint={{ waypoint.name }}" data-toggle="modal" data-target=".go-modal" data-name="{{ waypoint.name }}">
+                                        <span>{{ waypoint.name }}</span>
+                                    </button>
+                                </td>
+                                <td>{{ x }}, {{ y }}, {{ theta }}</td>
+                                <td>{{ waypoint.enabled }}</td>
+                                <td>
+                                    <button class="btn btn-default btn-lg" data-href="{% url 'set_current_waypoint' waypoint.name %}" data-pose="{{ x }}, {{ y }}, {{ theta }}" data-toggle="modal" data-name="{{ waypoint.name }}" data-target=".update-confirm-modal">
+                                        <span>Set Pose</span>
+                                    </button>
+                                    <button data-href="{% url 'delete_waypoint' %}?waypoint={{ waypoint.name }}" data-name="{{ waypoint.name }}" data-toggle="modal" data-target="#delete-confirm-modal" class="btn btn-danger btn-lg btn-delete">
+                                        <span>Delete</span>
+                                    </button>
+                                    {% if waypoint.enabled %}
+                                    <button class="btn btn-default btn-lg disabled">
+                                        <span>Disable</span>
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-default btn-lg disabled">
+                                        <span>Enable</span>
+                                    </button>                                     
+                                    {% endif %}
+                                </td>                                 
+                            </tr>
+                            {% endwith %}
+                            {% endfor %} 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- SAVE CURRENT POSE MODAL -->
+        <div class="modal fade save_pose_modal" tabindex="-1" id="save_pose_modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="/navigation/save_current_pose">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h3>Save Current Pose</h3>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="waypoint_name">Waypoint name</label>
+                                <input type="text" class="form-control" id="waypoint_name" name="waypoint_name" value="" placeholder="Enter a name for this location">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                            <button class="btn btn-default btn-lg" data-dismiss="modal">CANCEL</button>
+                        </p>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- UPDATE WAYPOINT POSE CONFIRMATION MODAL -->
+    <div class="modal fade update-confirm-modal" tabindex="-1" id="update-confirm-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3><strong><span id="update-waypoint"></span></strong></h3>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to <strong>update</strong> this waypoint?</p>
+                    <!--Current pose: <span id="current-pose"></span><br>
+                        New pose: <span id="new-pose"></span>-->
+                </div>
+                <div class="modal-footer">
+                    <p><a class="btn btn-primary btn-lg btn-setpose" id="yes-update" href="#">UPDATE</a><button class="btn btn-default btn-lg" data-dismiss="modal" id="no-del">CANCEL</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="modal fade delete-confirm-modal" tabindex="-1" id="delete-confirm-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3><strong><span id="del-waypoint"></span></strong></h3>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to <strong>delete</strong> this waypoint?</p>
+                </div>
+                <div class="modal-footer">
+                    <p><a class="btn btn-danger btn-lg btn-ok" id="yes-del" href="#">DELETE</a><button class="btn btn-default btn-lg" data-dismiss="modal" id="no-del">CANCEL</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- GO MODAL -->
+    <div class="modal fade go-modal" tabindex="-1" id="go-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3>Go to <span id="go-waypoint"></span></h3>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want go to this waypoint?</p>
+                    <span id="go-waypoint-detail"></span>
+                </div>
+                <div class="modal-footer">
+                    <p><a class="btn btn-primary btn-lg btn-ok" id="go-wp" href="#">YES</a><button class="btn btn-default btn-lg" data-dismiss="modal" id="no-del">CANCEL</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  NAV TEST MODAL -->
+    <div class="modal fade nav-test-modal" tabindex="-1" id="nav-test-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3>Nav Test</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Jeeves will run around in random order over several waypoints</p>
+                    <div class="well"> 
+                        <strong><span id="nav-test-status"></span></strong>
+                        <hr />
+                        <span id="nav-test-console"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <p class="text-center"><button class="btn btn-primary btn-lg btn-navtest" data-url="{% url 'nav_test' 'RUN' %}" data-mode="Starting" id="start-navtest">START</button><button class="btn btn-danger btn-lg btn-navtest-stop" data-url="{% url 'nav_test' 'HALT' %}" data-mode="Stopping" id="stop-navtest">STOP</button><button class="btn btn-default btn-lg btn-navtest-stop" data-url="{% url 'nav_test' 'HALT' %}" data-mode="Stopping" data-dismiss="modal">CANCEL</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/js/ie10-viewport-bug-workaround.js"></script>

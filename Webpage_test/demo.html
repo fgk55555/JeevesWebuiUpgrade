@@ -1,0 +1,47 @@
+<html>
+	<head>
+	    <!-- CSS -->
+		<style>
+		body {
+			font-family: arial, helvetica, sans-serif;
+			font-weight: bold;
+			font-size: 3em;
+		}
+		#a_div {
+			font-family: serif;
+			color: red;
+		}
+		#b_div {
+			color: #FF00DD;
+			text-align: center;
+		}
+		</style>
+		<!-- Javascript -->
+		<script type="text/javascript">
+	        function fubar() {
+	        	alert("Hello Javascript!");
+	        }
+	        $('#id').onClick(function() {
+	        	// do something
+	        })
+		</script>
+	</head>
+	<body>
+		Hello world
+		<br>
+		<div id="a_div">
+		Fubar
+		</div>
+		<div id="b_div" style="color:green;">
+		Barbaz
+		</div>
+		<div style="position:relative; font-size:50px; left: 50;z-index:5;">LAYER 1</div>
+		<div style="position:relative; left: 50; top: 20; z-index: 5">ABC</div>
+		<div style="position:relative; top:-100; left:5; color:red; font-size:80px; z-index:4; opacity:0.5;"><img src="15191434.jpg" /></div>
+		<a href="#" onclick="fubar()">Click me!</a>
+		<button onclick="fubar()">Foo!</button>
+	</body>
+	<footer>
+
+	</footer>
+</html>

@@ -1,0 +1,118 @@
+<html>
+<head>
+	<!-- include EventEmitter library ... currently not used in this sample -->
+	<script type="text/javascript"
+	  src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js">
+	</script>
+
+	<!-- include the roslibjs library ... required -->
+	<script type="text/javascript"
+	  src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js">
+	</script>
+
+	<!-- include jquery library ... required in the sample -->
+	<script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+
+
+	<script type="text/javascript">
+		// Copied from website http://blog.endpoint.com/2015/03/simple-cross-browser-communication-ros.html ... 
+		//* The Ros object, wrapping a web socket connection to rosbridge.
+		var ros = new ROSLIB.Ros({
+		  url: 'ws://localhost:9090' // url to your rosbridge server
+		});
+		 
+		//* A topic for messaging.
+		var exampleTopic = new ROSLIB.Topic({
+		  ros: ros,
+		  name: '/test_topic', // use a sensible namespace
+		  messageType: 'std_msgs/String'
+		});
+
+		/**
+		 * Serializes an object and publishes it to a std_msgs/String topic.
+		 * @param {ROSLIB.Topic} topic
+		 *       A topic to publish to. Must use messageType: std_msgs/String
+		 * @param {Object} obj
+		 *       Any object that can be serialized with JSON.stringify
+		 */
+		function publishEncoded(topic, obj) {
+		  var msg = new ROSLIB.Message({
+		    data: JSON.stringify(obj)
+		  });
+		  topic.publish(msg);
+		}
+		 
+		/**
+		 * Decodes an object from a std_msgs/String message.
+		 * @param {Object} msg
+		 *       Message from a std_msgs/String topic.
+		 * @return {Object}
+		 *       Decoded object from the message.
+		 */
+		function decodeMessage(msg) {
+		  return JSON.parse(msg.data);
+		}
+
+		// Example of subscribing to a topic with decodeMessage().
+		exampleTopic.subscribe(function(msg) {
+		  var decoded = decodeMessage(msg);
+		  // do something with the decod// Explicitly declare that we intend to publish on this Topic.
+		  console.log(decoded);
+
+		  // decoded is a Object type
+		  // Since the data sent is in JSON {'fubar': <text>}, to get the contents of <text>,
+		  // ... must point to the Object attribute: fubar
+		  // Show the contents of <text> in the HTML element with id 'topic_data' - see line 113
+		  $('#topic_data').text(decoded.fubar);
+		});
+
+		// Example of publishing to a topic
+		/*exampleTopic.advertise();
+		 
+		setInterval(function() {	
+		  var mySyncObject = {
+		    time: Date.now(),
+		    myFavoriteColor: 'red'
+		  };
+		  publishEncoded(exampleTopic, mySyncObject);
+		}, 1000);*/	// publish periodically every 1000ms 
+
+		// Example of simple publishing a text
+		function publish(text, dir, xLoc, yLoc) {
+
+			// The object to publish is JSON format, with key: value pair (like a Python dictionary)
+			// The JSON data is {'fubar': text}
+			// Looks like quotes are optional for the key and value
+			var myObject = {
+				name: text, 
+				theta: dir,
+				x: xLoc,
+				y: yLoc
+			}
+
+			// Publish to exampleTopic with data myObject
+			publishEncoded(exampleTopic, myObject);
+		}
+
+		// When the page is loaded, make the connection that when #thisdiv is clicked,
+		// ... publish the value of the attribute "myvar" for #thisdiv		
+		$(document).ready(function(){
+			$('#thisdiv').click(function(){
+				var data = $(this).attr('myvar'); // The attribute name "myvar" is something you make up - not restricted by HTML - see line 103
+				publish(data);
+			})
+		})
+
+	</script>
+</head>
+<body>
+	<!-- Two ways to create actions: -->
+	<!-- 1) by hyperlinks using <a ..></a> tags - see line 75 -->	
+	<a href="#" onclick="publish('robot_lab', .1, .2, .3)">Publish something</a>
+	<!-- 2) by any other element (e.g. div, buttons, img) - see line 91 -->
+	<div id="thisdiv" style="background:green; width:100px;" myvar="robotics_lab"><p>This Div</p></div>
+	<br>
+	<!-- Place to show the content of the /test_topic topic -->
+	<div id="topic_output"><p>Got message: <span id="topic_data"></span></p></div>
+</body>
+</html>
